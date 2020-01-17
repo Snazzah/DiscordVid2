@@ -18,10 +18,14 @@ module.exports = class Events {
     }
 
     // Command parsing
-    const args = Util.Prefix.strip(message).split(' ') || [];
-    const commandName = message.content.match(new RegExp(`^<@!?${this.client.user.id}>$`)) ? 'generate' : args.splice(0, 1)[0];
-    const command = this.client.cmds.get(commandName, message);
-    if(!command) return;
+    const isMention = message.content.match(new RegExp(`^<@!?${this.client.user.id}>$`));
+    const args = Util.Prefix.strip(message).split(' ');
+    const commandName = args.splice(0, 1)[0];
+    let command = this.client.cmds.get(commandName, message);
+    if(isMention)
+      command = this.client.cmds.get('generate', message);
+    else if(!message.content.match(Util.Prefix.regex(this.client)) || !command) return;
+
     try {
       await command._exec(message, { args });
     } catch (e) {

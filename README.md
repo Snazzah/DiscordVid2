@@ -23,6 +23,6 @@ Make sure to copy and paste `config/_default.json` into `config/default.json`. M
 
 ## Credits
 
-@this_vid by [shalvah](https://twitter.com/theshalvah). 
-[@this_vid2](https://github.com/TheEssem/this_vid2) by [TheEssem](https://twitter.com/TheEssem). 
+@this_vid by [shalvah](https://twitter.com/theshalvah).  
+[@this_vid2](https://github.com/TheEssem/this_vid2) by [TheEssem](https://twitter.com/TheEssem).  
 [@this_vid3](https://github.com/T-P0ser/this__vid3) by [T-P0ser](https://github.com/T-P0ser). 

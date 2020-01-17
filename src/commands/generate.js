@@ -142,7 +142,6 @@ module.exports = class Generate extends Command {
     if(!media)
       return message.channel.send(':stop_sign: I couldn\'t find a video to download!');
 
-    console.log(media);
     const input = await this.downloadFromURL(media.url, message.author.id);
     if(input.error)
       return message.channel.send(`:stop_sign: ${input.error}`);
@@ -157,6 +156,7 @@ module.exports = class Generate extends Command {
     message.channel.stopTyping();
 
     logger.info(`Finished processing ${input.id}!`);
+    this.client.stats.bumpStat('videos');
 
     await message.reply(content, {
       files: [{

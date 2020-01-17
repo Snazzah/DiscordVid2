@@ -1,0 +1,52 @@
+{
+  "discordToken": "XXX",
+	"prefixes": [
+    "dvid2.",
+    "discordvid2",
+    "dvid2",
+    "dv2"
+  ],
+  "owner": "12345678912345678",
+  "pastMessagesLimit": 10,
+  "requestTimeout": 10000,
+	"redis": {
+		"host": "localhost",
+		"port": 6379,
+		"prefix": "dvid2:",
+    "password": ""
+  },
+  "discord": {
+    "autoReconnect": true,
+    "disableEveryone": true,
+    "maxCachedMessages": 250,
+    "bot": true,
+    "disabledEvents": [
+      "TYPING_START",
+      "TYPING_STOP",
+      "GUILD_INTEGRATIONS_UPDATE",
+      "CHANNEL_PINS_UPDATE",
+      "VOICE_SERVER_UPDATE",
+      "GUILD_ROLE_CREATE",
+      "GUILD_ROLE_DELETE",
+      "GUILD_ROLE_UPDATE",
+      "GUILD_BAN_ADD",
+      "GUILD_BAN_REMOVE",
+      "GUILD_EMOJIS_UPDATE",
+      "MESSAGE_REACTION_ADD",
+      "MESSAGE_REACTION_REMOVE",
+      "MESSAGE_REACTION_REMOVE_ALL",
+      "WEBHOOKS_UPDATE"
+    ]
+  },
+	"debug": true,
+  "botlist": {},
+  "commandsPath": "./src/commands",
+  "cachePath": "./cache",
+  "video": {
+    "watermark": "Downloaded using @DiscordVid2",
+    "marquee": "This video was downloaded using @DiscordVid2. Reuploads are prohibited via DiscordVid2 guidelines. Visit https//github.com/Snazzah/DiscordVid2 for more information.",
+    "handle": "@DiscordVid2",
+    "duration": 30,
+    "textScale": 0.6
+  }
+}

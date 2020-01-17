@@ -1,0 +1,34 @@
+{
+  "name": "discordvid2",
+  "version": "1.0.0",
+  "description": "The objectively best Discord video downloader bot",
+  "main": "src/bot.js",
+  "scripts": {
+    "start": "node src/bot.js"
+  },
+  "dependencies": {
+    "abort-controller": "^3.0.0",
+    "config": "latest",
+    "dbots": "github:Snazzah/dbots.js#master",
+    "discord.js": "github:discordjs/discord.js#master",
+    "eventemitter3": "^4.0.0",
+    "file-type": "^13.1.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "fs-extra": "^8.1.0",
+    "mustache": "^4.0.0",
+    "node-fetch": "^2.3.0",
+    "redis": "^2.8.0",
+    "require-reload": "^0.2.2",
+    "winston": "^3.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.5.1",
+    "jshint": "^2.10.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Snazzah/DiscordVid2.git"
+  },
+  "author": "Snazzah <suggesttosnazzy@gmail.com>",
+  "license": "MIT"
+}

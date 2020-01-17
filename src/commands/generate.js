@@ -76,7 +76,7 @@ module.exports = class Generate extends Command {
     if(Util.Regex.url.test(message.content)) {
       const targetURL = message.content.match(Util.Regex.url).filter(url => new URL(url).pathname.endsWith('.mp4'))[0];
       const spoilers = Util.Regex.spoiler.test(message.content) ? message.content.match(Util.Regex.spoiler).map(m => Util.Regex.spoiler.exec(m)[1]) : [];
-      const hasSpoiler = targetURL ? spoilers.find(spoil => spoil.includes(targetURL.trim())) !== null : false;
+      const hasSpoiler = targetURL ? spoilers.find(spoil => spoil.includes(targetURL.trim())) !== undefined : false;
       if(targetURL) return {
         url: targetURL,
         spoiler: hasSpoiler,

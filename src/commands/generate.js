@@ -89,7 +89,7 @@ module.exports = class Generate extends Command {
         limit: config.get('pastMessagesLimit'),
         before: message.id,
       });
-      const filteredMessages = await Promise.all(pastMessages.array().reverse().map(pastMessage => this.findMedia(pastMessage, { usePast: false })));
+      const filteredMessages = await Promise.all(pastMessages.array().map(pastMessage => this.findMedia(pastMessage, { usePast: false })));
       return filteredMessages.filter(result => !!result)[0];
     }
 

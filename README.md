@@ -16,9 +16,10 @@ Clone this repo somewhere, `npm i` to install dependencies, and `npm start` to r
 ## Configs are your friend.
 Make sure to copy and paste `config/_default.json` into `config/default.json`. Most of the values are prefilled, but here is what you need to know (or do):
 - Fill in the `discordToken` field with the token of your bot.
-- Any colons in any of the strings of `video` will result in the text being cut off. So maybe don't do that.
-- Replase the user ID in `owner` with your own. (I wouldn't want to mess your stuff up.)
+- Replace the user ID in `owner` with your own. (I wouldn't want to mess your stuff up.)
+- If you want to parse Twitter URLs make sure to fill in the `twitter` consumer token and secret. [(Get them here)](https://developer.twitter.com/en/apps)
 - If you have set up Redis on the same system as your bot, you don't need to deal with `redis` all that much, but if you have a different setup, make sure that's filled.
+- Any colons in any of the strings of `video` will result in the text being cut off. So maybe don't do that.
 - You can change `cachePath` if you want, but you don't need to.
 
 ## Credits

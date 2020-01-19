@@ -45,6 +45,7 @@ exports.Regex = {
   escape: /[-/\\^$*+?.()|[\]{}]/g,
   url: /https?:\/\/(-\.)?([^\s/?.#-]+\.?)+(\/[^\s]*)?/gi,
   spoiler: /\|\|\s*?([^|]+)\s*?\|\|/gi,
+  twitter: /https?:\/\/twitter\.com\/\w+\/status\/(\d{17,19})(?:\/(?:video\/(\d))?)?/,
 };
 
 exports.Escape = {

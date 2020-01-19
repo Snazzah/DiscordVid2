@@ -42,6 +42,10 @@
   "botlist": {},
   "commandsPath": "./src/commands",
   "cachePath": "./cache",
+  "twitter": {
+    "consumer": "",
+    "secret": ""
+  },
   "video": {
     "watermark": "Downloaded using @DiscordVid2",
     "marquee": "This video was downloaded using @DiscordVid2. Reuploads are prohibited via DiscordVid2 guidelines. Visit https//github.com/Snazzah/DiscordVid2 for more information.",

@@ -64,6 +64,39 @@ module.exports = class Generate extends Command {
     ];
   }
 
+  get hasTwitterKeys() {
+    return config.has('twitter.consumer') && config.has('twitter.secret') && !!config.get('twitter.consumer') && !!config.get('twitter.secret');
+  }
+
+  async getTwitterStatus(id) {
+    if(!this.twitterToken) await this.refreshToken();
+    const response = await fetch(`https://api.twitter.com/1.1/statuses/show/${id}.json`, {
+      headers: {
+        Authorization: `Bearer ${this.twitterToken}`,
+      },
+    });
+    if(response.status === 404) {
+      return null;
+    } else if(response.status === 403) {
+      await this.refreshToken();
+      return await this.getTwitterStatus(id);
+    } else {
+      return response.json();
+    }
+  }
+
+  async refreshToken() {
+    const response = await fetch('https://api.twitter.com/oauth2/token', {
+      method: 'post',
+      body: new URLSearchParams('grant_type=client_credentials'),
+      headers: {
+        Authorization: `Basic ${Buffer.from(config.get('twitter.consumer') + ':' + config.get('twitter.secret'), 'binary').toString('base64')}`,
+      },
+    });
+    if(response.status === 403) throw new Error('Invalid Twitter Credentials');
+    this.twitterToken = (await response.json()).access_token;
+  }
+
   async findMedia(message, { usePast = true } = {}) {
     // Attachment
     if(message.attachments.size)
@@ -71,6 +104,23 @@ module.exports = class Generate extends Command {
         url: message.attachments.first().url,
         spoiler: message.attachments.first().spoiler,
       };
+
+    // Twitter URL detection in content
+    if(this.hasTwitterKeys && Util.Regex.twitter.test(message.content)) {
+      const [ url, twitterID, videoID ] = message.content.match(Util.Regex.twitter);
+      const twitterData = await this.getTwitterStatus(twitterID);
+      if(twitterData && twitterData.extended_entities.media) {
+        const video = twitterData.extended_entities.media[parseInt(videoID) - 1 || 0] || twitterData.extended_entities.media[0];
+        if(video.type === 'video' && video.video_info.variants.find(v => v.content_type === 'video/mp4')) {
+          const spoilers = Util.Regex.spoiler.test(message.content) ? message.content.match(Util.Regex.spoiler).map(m => Util.Regex.spoiler.exec(m)[1]) : [];
+          const hasSpoiler = url ? spoilers.find(spoil => spoil.includes(url.trim())) !== undefined : false;
+          return {
+            url: video.video_info.variants.find(v => v.content_type === 'video/mp4').url,
+            spoiler: hasSpoiler,
+          };
+        }
+      }
+    }
 
     // URL detection in content
     if(Util.Regex.url.test(message.content)) {
@@ -99,7 +149,7 @@ module.exports = class Generate extends Command {
   async downloadFromURL(url, userID) {
     // Make an AbortController to cut off any hanging requests
     const controller = new AbortController();
-    const timeout = setTimeout(controller.abort, config.get('requestTimeout'));
+    const timeout = setTimeout(controller.abort.bind(controller), config.get('requestTimeout'));
 
     // Make request
     const response = await fetch(url, { signal: controller.signal })

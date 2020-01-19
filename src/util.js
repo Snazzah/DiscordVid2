@@ -11,6 +11,8 @@ exports.sliceKeys = (obj, f) => {
   return newObject;
 };
 
+exports.formatNumber = num => num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+
 exports.Random = {
   int(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;

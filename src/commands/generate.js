@@ -109,7 +109,7 @@ module.exports = class Generate extends Command {
     if(this.hasTwitterKeys && Util.Regex.twitter.test(message.content)) {
       const [ url, twitterID, videoID ] = message.content.match(Util.Regex.twitter);
       const twitterData = await this.getTwitterStatus(twitterID);
-      if(twitterData && twitterData.extended_entities.media) {
+      if(twitterData && twitterData.extended_entities && twitterData.extended_entities.media) {
         const video = twitterData.extended_entities.media[parseInt(videoID) - 1 || 0] || twitterData.extended_entities.media[0];
         if(video.type === 'video' && video.video_info.variants.find(v => v.content_type === 'video/mp4')) {
           const spoilers = Util.Regex.spoiler.test(message.content) ? message.content.match(Util.Regex.spoiler).map(m => Util.Regex.spoiler.exec(m)[1]) : [];

@@ -9,7 +9,7 @@ module.exports = class GitHUb extends Command {
   }; }
 
   exec(message) {
-    message.channel.send('Here is the link to imy source code!\n:arrow_forward:  <https://github.com/Snazzah/DiscordVid2>');
+    message.channel.send('Here is the link to my source code!\n:arrow_forward:  <https://github.com/Snazzah/DiscordVid2>');
   }
 
   get metadata() { return {

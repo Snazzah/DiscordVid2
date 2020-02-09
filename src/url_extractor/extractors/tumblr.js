@@ -4,7 +4,7 @@ const cheerio = require('cheerio');
 module.exports = {
   title: 'Tumblr',
   test_urls: [
-    'https://tatianamaslanydaily.tumblr.com/post/54196191430/orphan-black-dvd-extra-behind-the-scenes',
+    'https://hdvideotest.tumblr.com/post/130323439814',
   ],
   regex: /https?:\/\/([^/?#&]+)\.tumblr\.com\/(?:post|video)\/([0-9]+)(?:$|[/?#])/,
   extract: async (_, url) => {

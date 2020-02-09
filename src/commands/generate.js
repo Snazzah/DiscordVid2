@@ -98,19 +98,33 @@ module.exports = class Generate extends Command {
     return false;
   }
 
-  async downloadFromURL(url, userID) {
+  async request(url, method = 'GET') {
     // Make an AbortController to cut off any hanging requests
     const controller = new AbortController();
     const timeout = setTimeout(controller.abort.bind(controller), config.get('requestTimeout'));
 
     // Make request
-    const response = await fetch(url, { signal: controller.signal })
-      .catch(error => {
-        if(error.name === 'AbortError')
-          return { error: 'Request took too long!' };
-        else return { error: 'Couldn\'t fetch from URL!' };
-      });
+    const response = await fetch(url, {
+      method,
+      signal: controller.signal,
+    }).catch(error => {
+      if(error.name === 'AbortError')
+        return { error: 'Request took too long!' };
+      else return { error: 'Couldn\'t fetch from URL!' };
+    });
     clearTimeout(timeout);
+    return response;
+  }
+
+  async downloadFromURL(url, userID) {
+    // Check Content Type from HEAD request
+    const headResponse = await this.request(url, 'HEAD');
+    if(headResponse.error) return headResponse;
+
+    if(headResponse.headers.get('content-type') !== 'video/mp4')
+      return { error: 'Invalid file format!' };
+
+    const response = await this.request(url);
     if(response.error) return response;
 
     // Get buffer and check type

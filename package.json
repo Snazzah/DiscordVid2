@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "abort-controller": "^3.0.0",
+    "cheerio": "^1.0.0-rc.3",
     "config": "latest",
     "dbots": "github:Snazzah/dbots.js#master",
     "discord.js": "github:discordjs/discord.js#master",

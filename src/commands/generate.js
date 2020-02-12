@@ -71,6 +71,7 @@ module.exports = class Generate extends Command {
       return {
         url: message.attachments.first().url,
         spoiler: message.attachments.first().spoiler,
+        skipHead: true,
       };
 
     // URL detection in content
@@ -82,6 +83,7 @@ module.exports = class Generate extends Command {
       if(targetURL) return {
         url: convertedURL,
         spoiler: hasSpoiler,
+        skipHead: convertedURL !== targetURL,
       };
     }
 
@@ -116,13 +118,15 @@ module.exports = class Generate extends Command {
     return response;
   }
 
-  async downloadFromURL(url, userID) {
-    // Check Content Type from HEAD request
-    const headResponse = await this.request(url, 'HEAD');
-    if(headResponse.error) return headResponse;
+  async downloadFromURL(url, userID, skipHead = false) {
+    if(!skipHead) {
+      // Check Content Type from HEAD request
+      const headResponse = await this.request(url, 'HEAD');
+      if(headResponse.error) return headResponse;
 
-    if(headResponse.headers.get('content-type') !== 'video/mp4')
-      return { error: 'Invalid file format!' };
+      if(headResponse.headers.get('content-type') !== 'video/mp4')
+        return { error: 'Invalid file format!' };
+    }
 
     const response = await this.request(url);
     if(response.error) return response;
@@ -158,7 +162,7 @@ module.exports = class Generate extends Command {
     if(!media)
       return message.channel.send(':stop_sign: I couldn\'t find a video to download!');
 
-    const input = await this.downloadFromURL(media.url, message.author.id);
+    const input = await this.downloadFromURL(media.url, message.author.id, media.skipHead);
     if(input.error)
       return message.channel.send(`:stop_sign: ${input.error}`);
 

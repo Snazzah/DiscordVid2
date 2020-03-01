@@ -38,8 +38,8 @@ exports.Prefix = {
   regex(client, prefixes = config.get('prefixes')) {
     return new RegExp(`^((?:<@!?${client.user.id}>|${prefixes.map(prefix => exports.Escape.regex(prefix)).join('|')})\\s?)(\\n|.)`, 'i');
   },
-  strip(message, prefixes) {
-    return message.content.replace(exports.Prefix.regex(message.client, prefixes), '$2').replace(/\s\s+/g, ' ').trim();
+  strip(message, client, prefixes) {
+    return message.content.replace(exports.Prefix.regex(client, prefixes), '$2').replace(/\s\s+/g, ' ').trim();
   },
 };
 

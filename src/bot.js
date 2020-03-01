@@ -1,4 +1,4 @@
-const Discord = require('discord.js');
+const Eris = require('eris');
 const dbots = require('dbots');
 const Database = require('./database');
 const EventHandler = require('./events');
@@ -10,27 +10,30 @@ const fs = require('fs');
 const path = require('path');
 const config = require('config');
 
-class DiscordVid2 extends Discord.Client {
+class DiscordVid2 extends Eris.Client {
   constructor({ packagePath, mainDir } = {}) {
     // Initialization
     const pkg = require(packagePath || `${mainDir}/package.json`);
     const discordConfig = JSON.parse(JSON.stringify(config.get('discord')));
-    Object.assign(discordConfig, {
-      userAgent: { version: pkg.version },
-    });
-    super(discordConfig);
+    super(config.get('discordToken'), discordConfig);
     this.dir = mainDir;
     this.pkg = pkg;
     this.logger = logger;
 
     // Events
-    this.on('ready', () => logger.info('Logged in'));
-    this.on('warn', s => logger.warn(s));
-    this.on('error', s => logger.error(s));
-    this.on('disconnected', () => logger.info('Disconnected'));
+    this.on('ready', () => logger.info('All shards ready.'));
+    this.on('disconnect', () => logger.info('All Shards Disconnected.'));
     this.on('reconnecting', () => logger.warn('Reconnecting'));
-    this.on('resume', r => logger.warn(`Resumed. ${r} events were replayed.`));
-    if(config.get('debug')) this.on('debug', s => logger.debug(s));
+    this.on('debug', message => logger.debug(message));
+
+    // Shard Events
+    this.on('connect', id => logger.info(`Shard ${id} connected.`));
+    this.on('error', (error, id) => logger.error(`Error in shard ${id}`, error));
+    this.on('hello', (_, id) => logger.info(`Shard ${id} recieved hello.`));
+    this.on('warn', (message, id) => logger.warn(`Warning in Shard ${id}`, message));
+    this.on('shardReady', id => logger.info(`Shard ${id} ready.`));
+    this.on('shardResume', id => logger.warn(`Shard ${id} resumed.`));
+    this.on('shardDisconnect', (error, id) => logger.warn(`Shard ${id} disconnected`, error));
 
     // SIGINT & uncaught exceptions
     process.once('uncaughtException', err => {
@@ -53,17 +56,24 @@ class DiscordVid2 extends Discord.Client {
       } else logger.info('Cache folder exists, skipping');
     });
 
-    process.env.LOGGER_PREFIX = this.logPrefix;
     process.env.LOGGER_DEBUG = config.get('debug');
 
     logger.info('Client initialized');
   }
 
+  waitTill(event) {
+    return new Promise(resolve => this.once(event, resolve));
+  }
+
   async start() {
     this.db = new Database(this);
     await this.db.connect(config.get('redis'));
-    await this.login();
-    this.user.setActivity('videos using DiscordVid2', { type: 3 });
+    await this.connect();
+    await this.waitTill('ready');
+    this.editStatus('online', {
+      name: 'videos using DiscordVid2',
+      type: 3,
+    });
     this.stats = new Stats(this);
     this.stats.init();
     this.cmds = new CommandLoader(this, path.join(this.dir, config.get('commandsPath')), config.get('debug'));
@@ -77,7 +87,7 @@ class DiscordVid2 extends Discord.Client {
     this.poster = new dbots.Poster({
       client: this,
       apiKeys: config.get('botlist'),
-      clientLibrary: 'discord.js',
+      clientLibrary: 'eris',
       useSharding: false,
       voiceConnections: () => 0,
     });
@@ -103,13 +113,10 @@ class DiscordVid2 extends Discord.Client {
     console.log(e.response.data);
   }
 
-  login() {
-    return super.login(config.get('discordToken'));
-  }
-
   async dieGracefully() {
     logger.info('Slowly dying...');
-    super.destroy();
+    super.disconnect();
+    // await this.waitTill('disconnect');
     await this.db.disconnect();
     logger.info('It\'s all gone...');
   }

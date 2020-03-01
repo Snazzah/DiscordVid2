@@ -5,7 +5,6 @@ const fetch = require('node-fetch');
 const fs = require('fs');
 const path = require('path');
 const FileType = require('file-type');
-const { escapeMarkdown } = require('discord.js');
 const AbortController = require('abort-controller');
 const generateVideo = require('../videogen');
 const logger = require('../logger')('[GEN-CMD]');
@@ -155,7 +154,7 @@ module.exports = class Generate extends Command {
     if(message.channel.type !== 'text' ? false : !message.channel.permissionsFor(message.client.user).has('ATTACH_FILES'))
       return message.channel.send(':stop_sign: I cannot attach files!');
 
-    const displayName = escapeMarkdown(message.member ? message.member.displayName : message.author.username);
+    const displayName = Util.Escape.markdown(message.member ? message.member.displayName : message.author.username);
     const content = Util.Random.prompt(this.MESSAGES, { displayName });
 
     const media = await this.findMedia(message);

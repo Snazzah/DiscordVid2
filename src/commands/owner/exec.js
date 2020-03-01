@@ -17,7 +17,7 @@ module.exports = class Exec extends Command {
   async exec(message) {
     if(message.author.id !== config.get('owner')) return;
     message.channel.startTyping();
-    exec(Util.Prefix.strip(message).split(' ').slice(1).join(' '), (err, stdout, stderr) => {
+    exec(Util.Prefix.strip(message, this.client).split(' ').slice(1).join(' '), (err, stdout, stderr) => {
       message.channel.stopTyping();
       if(err) return message.channel.send(this.codeBlock(err, 'js'));
       message.channel.send((stderr ? this.codeBlock(`STDOUT Error: ${stderr}`, 'js') + '\n' : '') + this.codeBlock(stdout));

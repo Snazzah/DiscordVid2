@@ -19,6 +19,7 @@ class DiscordVid2 extends Eris.Client {
     this.dir = mainDir;
     this.pkg = pkg;
     this.logger = logger;
+    this.typingIntervals = new Map();
 
     // Events
     this.on('ready', () => logger.info('All shards ready.'));
@@ -119,6 +120,27 @@ class DiscordVid2 extends Eris.Client {
     // await this.waitTill('disconnect');
     await this.db.disconnect();
     logger.info('It\'s all gone...');
+  }
+
+  // Typing
+
+  async startTyping(channel) {
+    if(this.isTyping(channel)) return;
+    await channel.sendTyping();
+    this.typingIntervals.set(channel.id, setInterval(() => {
+      channel.sendTyping().catch(() => this.stopTyping(channel));
+    }, 5000));
+  }
+
+  isTyping(channel) {
+    return this.typingIntervals.has(channel.id);
+  }
+
+  stopTyping(channel) {
+    if(!this.isTyping(channel)) return;
+    const interval = this.typingIntervals.get(channel.id);
+    clearInterval(interval);
+    this.typingIntervals.delete(channel.id);
   }
 }
 

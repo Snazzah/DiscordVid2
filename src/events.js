@@ -27,8 +27,8 @@ module.exports = class Events {
     } catch (e) {
       logger.error(`The '${command.name}' command failed.`);
       console.log(e);
-      message.channel.send(':fire: An error occurred while processing that command!');
-      message.channel.stopTyping(true);
+      this.client.createMessage(message.channel.id, ':fire: An error occurred while processing that command!');
+      this.client.stopTyping(message.channel);
     }
   }
 };

@@ -9,9 +9,9 @@ module.exports = class Ping extends Command {
   }; }
 
   async exec(message) {
-    const currentPing = this.client.ws.ping;
+    const currentPing = this.client.shards.values().map(shard => shard.latency).reduce((prev, val) => prev + val, 0);
     const timeBeforeMessage = Date.now();
-    const sentMessage = await message.channel.send(`> :ping_pong: ***Pong!***\n> WS: ${currentPing} ms`);
+    const sentMessage = await this.client.createMessage(message.channel.id, `> :ping_pong: ***Pong!***\n> WS: ${currentPing} ms`);
     await sentMessage.edit(`> :ping_pong: ***Pong!***\n> WS: ${currentPing} ms\n> REST: ${Date.now() - timeBeforeMessage} ms`);
   }
 

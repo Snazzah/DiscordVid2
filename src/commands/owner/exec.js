@@ -16,11 +16,11 @@ module.exports = class Exec extends Command {
 
   async exec(message) {
     if(message.author.id !== config.get('owner')) return;
-    message.channel.startTyping();
+    await this.client.startTyping(message.channel);
     exec(Util.Prefix.strip(message, this.client).split(' ').slice(1).join(' '), (err, stdout, stderr) => {
-      message.channel.stopTyping();
-      if(err) return message.channel.send(this.codeBlock(err, 'js'));
-      message.channel.send((stderr ? this.codeBlock(`STDOUT Error: ${stderr}`, 'js') + '\n' : '') + this.codeBlock(stdout));
+      this.client.stopTyping(message.channel);
+      if(err) return this.client.createMessage(message.channel.id, this.codeBlock(err, 'js'));
+      return this.client.createMessage(message.channel.id, (stderr ? this.codeBlock(`STDOUT Error: ${stderr}`, 'js') + '\n' : '') + this.codeBlock(stdout));
     });
   }
 

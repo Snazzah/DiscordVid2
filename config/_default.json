@@ -18,7 +18,7 @@
   "discord": {
     "autoreconnect": true,
     "disableEveryone": true,
-    "messageLimit": 250,
+    "messageLimit": 10,
     "defaultImageFormat": "png",
     "maxShards": "auto",
     "disableEvents": [

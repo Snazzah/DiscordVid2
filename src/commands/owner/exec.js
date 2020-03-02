@@ -7,6 +7,7 @@ module.exports = class Exec extends Command {
   get name() { return 'exec'; }
 
   get _options() { return {
+    aliases: ['ex'],
     listed: false,
   }; }
 

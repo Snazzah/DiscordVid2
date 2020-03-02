@@ -9,7 +9,7 @@ module.exports = class Invite extends Command {
   }; }
 
   exec(message) {
-    message.channel.send('Here is the link to invite me to other servers!\n:arrow_forward:  <https://invite.snaz.in/discordvid2>');
+    return this.client.createMessage(message.channel.id, 'Here is the link to invite me to other servers!\n:arrow_forward:  <https://invite.snaz.in/discordvid2>');
   }
 
   get metadata() { return {

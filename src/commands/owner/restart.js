@@ -11,7 +11,7 @@ module.exports = class Restart extends Command {
 
   async exec(message) {
     if(message.author.id !== config.get('owner')) return;
-    await message.channel.send('Restarting shard...');
+    await this.client.createMessage(message.channel.id, 'Restarting shard...');
     await this.client.dieGracefully();
     process.exit(0);
   }

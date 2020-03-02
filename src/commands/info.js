@@ -10,11 +10,14 @@ module.exports = class Info extends Command {
     cooldown: 0,
   }; }
 
+  canUseEmojis(message) {
+    return message.channel.type === 1 || message.channel.permissionsOf(this.client.user.id).has('externalEmojis');
+  }
+
   async exec(message) {
-    const canUseExternalEmoji = message.channel.type == 'text' && message.channel.permissionsFor(message.client.user).has('USE_EXTERNAL_EMOJIS');
     const videoCount = parseInt(await this.client.db.get('videos:total'));
-    message.channel.send(
-      `> ${canUseExternalEmoji ? '<:DiscordVid2:667610979248504833> ' : ''}**DiscordVid2 *(v${this.client.pkg.version})*** is a port of the twitter account @this\\_\\_vid3 (which is a port of @this\\_vid2)\n` +
+    return this.client.createMessage(message.channel.id,
+      `> ${this.canUseEmojis(message) ? '<:DiscordVid2:667610979248504833> ' : ''}**DiscordVid2 *(v${this.client.pkg.version})*** is a port of the twitter account @this\\_\\_vid3 (which is a port of @this\\_vid2)\n` +
       '> The objectively best Discord video downloader bot.\n> \n' +
       `> Videos over **${config.get('video.duration')}** seconds are cut off.\n` +
       `> Media can be found past **${config.get('pastMessagesLimit')}** messages.\n` +

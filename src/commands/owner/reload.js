@@ -9,13 +9,16 @@ module.exports = class Reload extends Command {
     listed: false,
   }; }
 
+  canUseEmojis(message) {
+    return message.channel.type === 1 || message.channel.permissionsOf(this.client.user.id).has('externalEmojis');
+  }
+
   async exec(message) {
     if(message.author.id !== config.get('owner')) return;
-    const canUseExternalEmoji = message.channel.type == 'text' && message.channel.permissionsFor(message.client.user).has('USE_EXTERNAL_EMOJIS');
-    const sentMessage = await message.channel.send(`${canUseExternalEmoji ? '<a:matchmaking:415045517123387403>' : ':recycle:'} Reloading commands...`);
+    const sentMessage = await this.client.createMessage(message.channel.id, `${this.canUseEmojis(message) ? '<a:matchmaking:415045517123387403>' : ':recycle:'} Reloading commands...`);
     this.client.cmds.reload();
     this.client.cmds.preloadAll();
-    sentMessage.edit(`${canUseExternalEmoji ? '<:check:314349398811475968>' : ':white_check_mark:'} Reloaded commands.`);
+    return sentMessage.edit(`${this.canUseEmojis(message) ? '<:check:314349398811475968>' : ':white_check_mark:'} Reloaded commands.`);
   }
 
   get metadata() { return {

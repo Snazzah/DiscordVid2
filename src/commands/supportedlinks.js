@@ -12,7 +12,7 @@ module.exports = class SupportedLinks extends Command {
   exec(message) {
     if(!Extractor.extractors.length)
       Extractor.loadExtractors();
-    message.channel.send('Here are all the URLs I can get videos from:\n' +
+    return this.client.createMessage(message.channel.id, 'Here are all the URLs I can get videos from:\n' +
       Extractor.extractors.map(extractor => `> **${extractor.title}**: <${extractor.test_urls[0]}>`).join('\n'));
   }
 

@@ -16,11 +16,12 @@
     "password": ""
   },
   "discord": {
-    "autoReconnect": true,
+    "autoreconnect": true,
     "disableEveryone": true,
-    "maxCachedMessages": 250,
-    "bot": true,
-    "disabledEvents": [
+    "messageLimit": 10,
+    "defaultImageFormat": "png",
+    "maxShards": "auto",
+    "disableEvents": [
       "TYPING_START",
       "TYPING_STOP",
       "GUILD_INTEGRATIONS_UPDATE",

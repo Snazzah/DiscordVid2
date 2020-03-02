@@ -4,22 +4,18 @@ const Util = require('./util');
 module.exports = class Events {
   constructor(client) {
     this.client = client;
-    client.on('message', this.onMessage.bind(this));
+    client.on('messageCreate', this.onMessage.bind(this));
   }
 
   async onMessage(message) {
     this.client.stats.bumpStat('messages');
-    if(message.author.bot) return;
-    try {
-      // 2048
-      if(message.channel.type !== 'dm' && !message.channel.permissionsFor(this.client.user).has('SEND_MESSAGES')) return;
-    } catch (e) {
-      return logger.error('Critical permission error', message.channel.type, message.channel.permissionsFor(this.client.user));
-    }
+    if(message.author.bot || message.author.system) return;
+    // Check to see if bot can send messages
+    if(message.channel.type !== 1 && !message.channel.permissionsOf(this.client.user.id).has('sendMessages')) return;
 
     // Command parsing
     const isMention = message.content.match(new RegExp(`^<@!?${this.client.user.id}>$`));
-    const args = Util.Prefix.strip(message).split(' ');
+    const args = Util.Prefix.strip(message, this.client).split(' ');
     const commandName = args.splice(0, 1)[0];
     let command = this.client.cmds.get(commandName, message);
     if(isMention)
@@ -31,8 +27,8 @@ module.exports = class Events {
     } catch (e) {
       logger.error(`The '${command.name}' command failed.`);
       console.log(e);
-      message.channel.send(':fire: An error occurred while processing that command!');
-      message.channel.stopTyping(true);
+      this.client.createMessage(message.channel.id, ':fire: An error occurred while processing that command!');
+      this.client.stopTyping(message.channel);
     }
   }
 };

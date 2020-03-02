@@ -5,7 +5,6 @@ const fetch = require('node-fetch');
 const fs = require('fs');
 const path = require('path');
 const FileType = require('file-type');
-const { escapeMarkdown } = require('discord.js');
 const AbortController = require('abort-controller');
 const generateVideo = require('../videogen');
 const logger = require('../logger')('[GEN-CMD]');
@@ -67,10 +66,10 @@ module.exports = class Generate extends Command {
 
   async findMedia(message, { usePast = true } = {}) {
     // Attachment
-    if(message.attachments.size)
+    if(message.attachments[0])
       return {
-        url: message.attachments.first().url,
-        spoiler: message.attachments.first().spoiler,
+        url: message.attachments[0].url,
+        spoiler: message.attachments[0].filename.startsWith('SPOILER_'),
         skipHead: true,
       };
 
@@ -89,11 +88,8 @@ module.exports = class Generate extends Command {
 
     // Past Messages
     if(usePast) {
-      const pastMessages = await message.channel.messages.fetch({
-        limit: config.get('pastMessagesLimit'),
-        before: message.id,
-      });
-      const filteredMessages = await Promise.all(pastMessages.array().map(pastMessage => this.findMedia(pastMessage, { usePast: false })));
+      const pastMessages = await message.channel.getMessages(config.get('pastMessagesLimit'), message.id);
+      const filteredMessages = await Promise.all(pastMessages.map(pastMessage => this.findMedia(pastMessage, { usePast: false })));
       return filteredMessages.filter(result => !!result)[0];
     }
 
@@ -153,36 +149,35 @@ module.exports = class Generate extends Command {
 
   async exec(message) {
     if(message.channel.type !== 'text' ? false : !message.channel.permissionsFor(message.client.user).has('ATTACH_FILES'))
-      return message.channel.send(':stop_sign: I cannot attach files!');
+      return this.client.createMessage(message.channel.id, ':stop_sign: I cannot attach files!');
 
-    const displayName = escapeMarkdown(message.member ? message.member.displayName : message.author.username);
+    const displayName = Util.Escape.markdown(message.member && message.member.nick ? message.member.nick : message.author.username);
+    const contentPrefix = message.channel.type !== 1 ? `${message.author.mention}, ` : '';
     const content = Util.Random.prompt(this.MESSAGES, { displayName });
 
     const media = await this.findMedia(message);
     if(!media)
-      return message.channel.send(':stop_sign: I couldn\'t find a video to download!');
+      return this.client.createMessage(message.channel.id, ':stop_sign: I couldn\'t find a video to download!');
 
     const input = await this.downloadFromURL(media.url, message.author.id, media.skipHead);
     if(input.error)
-      return message.channel.send(`:stop_sign: ${input.error}`);
+      return this.client.createMessage(message.channel.id, `:stop_sign: ${input.error}`);
 
     // Start generating
-    message.channel.startTyping();
+    await this.client.startTyping(message.channel);
     await generateVideo(input.path, input.outputPath, {
-      discordTag: message.author.tag,
+      discordTag: `${message.author.username}#${message.author.discriminator}`,
       videoGenPath: path.join(this.client.dir, './src/videogen'),
       id: input.id,
     });
-    message.channel.stopTyping();
+    this.client.stopTyping(message.channel);
 
     logger.info(`Finished processing ${input.id}!`);
     this.client.stats.bumpStat('videos');
 
-    await message.reply(content, {
-      files: [{
-        attachment: input.outputPath,
-        name: `${media.spoiler ? 'SPOILER_' : ''}${input.id}.mp4`,
-      }],
+    await this.client.createMessage(message.channel.id, contentPrefix + content, {
+      file: fs.readFileSync(input.outputPath),
+      name: `${media.spoiler ? 'SPOILER_' : ''}${input.id}.mp4`,
     });
 
     // Cleanup

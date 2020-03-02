@@ -25,7 +25,7 @@ class DiscordVid2 extends Eris.Client {
     this.on('ready', () => logger.info('All shards ready.'));
     this.on('disconnect', () => logger.info('All Shards Disconnected.'));
     this.on('reconnecting', () => logger.warn('Reconnecting'));
-    this.on('debug', message => logger.debug(message));
+    if(config.get('debug')) this.on('debug', message => logger.debug(message));
 
     // Shard Events
     this.on('connect', id => logger.info(`Shard ${id} connected.`));

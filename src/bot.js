@@ -147,6 +147,6 @@ class DiscordVid2 extends Eris.Client {
 const DVid2 = new DiscordVid2({ mainDir: path.join(__dirname, '..'), packagePath: '../package.json' });
 DVid2.start().catch(e => {
   DVid2.logger.error('Failed to start bot! Exiting in 10 seconds...');
-  DVid2.logger.error(e);
+  console.error(e);
   setTimeout(() => process.exit(0), 10000);
 });
